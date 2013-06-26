@@ -1,12 +1,14 @@
-CREATE TABLE user (
+CREATE TABLE users (
   id integer primary key,
   name varchar(40) not null,
   password varchar(220) not null
 );
 
-CREATE TABLE site (
+CREATE TABLE sites (
   url char(1500) primary key,
-  rules integer[]
+  rules integer[],
+  report bytea,
+  ready boolean default 'false'
 );
 
 CREATE TABLE rules (
@@ -16,7 +18,6 @@ CREATE TABLE rules (
 );
 
 CREATE TABLE user_site (
-  id integer primary key,
-  user_id integer references user(id) on update cascade,
-  site_url char(1500) references site(url) on update cascade
+  user_id integer references users(id) on update cascade,
+  site_url char(1500) references sites(url) on update cascade
 );
