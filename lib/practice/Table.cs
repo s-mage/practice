@@ -25,7 +25,6 @@ namespace Rooletochka
         {
             command = com;
             connection = con;
-            data = commandToData(command);
         }
 
         public Table(string com)
@@ -41,7 +40,6 @@ namespace Rooletochka
             connection = new NpgsqlConnection(connect);
 
             command = com;
-            data = commandToData(command);
         }
 
         private NpgsqlDataReader commandToData(string command)
@@ -50,10 +48,30 @@ namespace Rooletochka
             return query.ExecuteReader();
         }
 
+        // Initialize data field. It should be initialized once, 
+        // or it would be slow as I don't know what.
+        //
+        public Table All()
+        {
+            data = commandToData(command);
+            return this;
+        }
+
+        // Select operator, you can write something like
+        // myAwesomeTable.Select("*").All() instead of
+        // NpgsqlCommand("select * from myAwesomeTable", connection).
+        //
         public Table Select(string query)
         {
             string result = String.Format("select {0} from {1}",
                 query, command);
+            return new Table(result, connection);
+        }
+
+        public Table Where(string statement)
+        {
+            string result = String.Format("{0} where ({1})",
+                command, statement);
             return new Table(result, connection);
         }
 
