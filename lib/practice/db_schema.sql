@@ -6,16 +6,17 @@ CREATE TABLE users (
 
 CREATE TABLE sites (
   id serial primary key,
-  url char(250) unique
-};
+  url char(250) unique,
+  ready boolean default 'false'
+);
 
 
 CREATE TABLE reports (
   id serial primary key,
   site_id integer references sites(id) on update cascade,
+  pages text[],
   rules hstore[],
-  path char(250),
-  ready boolean default 'false'
+  path char(250)
 );
 
 CREATE TABLE rules (
@@ -27,5 +28,6 @@ CREATE TABLE rules (
 
 CREATE TABLE user_site (
   user_id integer references users(id) on update cascade,
-  site_url integer references sites(id) on update cascade
+  site_id integer references sites(id) on update cascade,
+  unique (user_id, site_id)
 );

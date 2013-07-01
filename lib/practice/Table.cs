@@ -25,6 +25,7 @@ namespace Rooletochka
         {
             command = com;
             connection = con;
+            connection.Open();
         }
 
         public Table(string com)
@@ -38,6 +39,7 @@ namespace Rooletochka
             string connect = String.Format(@"Server=127.0.0.1;Port=5432;
                 User Id={0};Password={1};Database=practice;", userId, password);
             connection = new NpgsqlConnection(connect);
+            connection.Open();
 
             command = com;
         }
@@ -88,24 +90,6 @@ namespace Rooletochka
             }
             NpgsqlCommand insertCommand = new NpgsqlCommand(query, connection);
             insertCommand.ExecuteNonQuery();
-        }
-    }
-
-    public class Test
-    {
-        public static void Main()
-        {
-            Console.Write("User Id: ");
-            string userId = Console.ReadLine();
-
-            Console.Write("Password: ");
-            string password = Console.ReadLine();
-
-            string command = String.Format(@"Server=127.0.0.1;Port=5432;
-                User Id={0};Password={1};Database=practice;", userId, password);
-            NpgsqlConnection connect = new NpgsqlConnection(command);
-            connect.Open();
-            connect.Close();
         }
     }
 }
