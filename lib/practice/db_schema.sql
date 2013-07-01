@@ -1,13 +1,20 @@
 CREATE TABLE users (
   id serial primary key,
   name varchar(40) not null,
-  password varchar(220) not null
+  password varchar(20) not null
 );
 
 CREATE TABLE sites (
-  url char(250) primary key,
+  id serial primary key,
+  url char(250) unique
+};
+
+
+CREATE TABLE reports (
+  id serial primary key,
+  site_id integer references sites(id) on update cascade,
   rules hstore[],
-  report char(250),
+  path char(250),
   ready boolean default 'false'
 );
 
@@ -20,5 +27,5 @@ CREATE TABLE rules (
 
 CREATE TABLE user_site (
   user_id integer references users(id) on update cascade,
-  site_url char(1500) references sites(url) on update cascade
+  site_url integer references sites(id) on update cascade
 );
