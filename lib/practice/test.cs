@@ -11,8 +11,12 @@ class Test
         var connection = new NpgsqlConnection(connect);
         connection.Open();
         Table users = new Table("users", connection);
+        
+        NpgsqlCommand npgSqlCommand = new NpgsqlCommand("SELECT * FROM users", connection);
+        NpgsqlDataReader npgSqlDataReader = npgSqlCommand.ExecuteReader();
+
         users.Insert("'mala', 'fia'", "name, password");
-        users.Select("*").All();
+        //users.Select("*").All();
         Console.WriteLine("16th string");
         connection.Close();
     }

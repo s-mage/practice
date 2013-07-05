@@ -42,18 +42,13 @@ namespace Rooletochka
             command = com;
         }
 
-        private NpgsqlDataReader commandToData(string command)
-        {
-            NpgsqlCommand query = new NpgsqlCommand(command);
-            return query.ExecuteReader();
-        }
-
         // Initialize data field. It should be initialized once, 
         // or it would be slow as I don't know what.
         //
         public Table All()
         {
-            data = commandToData(command);
+            NpgsqlCommand query = new NpgsqlCommand(command);
+            data =  query.ExecuteReader();
             return this;
         }
 
@@ -79,12 +74,12 @@ namespace Rooletochka
         {
             string query;
 
-            if(fields != "") {
-                query = String.Format(@"insert into {0} ({1})
-                    values ({2})", command, fields, values);
-            } else {
+            if(fields == "") {
                 query = String.Format(@"insert into {0}
                     values ({1})", command, values);
+            } else {
+                query = String.Format(@"insert into {0} ({1})
+                    values ({2})", command, fields, values);
             }
             NpgsqlCommand insertCommand = new NpgsqlCommand(query, connection);
             insertCommand.ExecuteNonQuery();
