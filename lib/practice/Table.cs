@@ -25,7 +25,6 @@ namespace Rooletochka
         {
             command = com;
             connection = con;
-            connection.Open();
         }
 
         public Table(string com)
@@ -39,7 +38,6 @@ namespace Rooletochka
             string connect = String.Format(@"Server=127.0.0.1;Port=5432;
                 User Id={0};Password={1};Database=practice;", userId, password);
             connection = new NpgsqlConnection(connect);
-            connection.Open();
 
             command = com;
         }
@@ -81,7 +79,7 @@ namespace Rooletochka
         {
             string query;
 
-            if(fields == "") {
+            if(fields != "") {
                 query = String.Format(@"insert into {0} ({1})
                     values ({2})", command, fields, values);
             } else {
