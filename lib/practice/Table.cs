@@ -47,8 +47,8 @@ namespace Rooletochka
         //
         public Table All()
         {
-            NpgsqlCommand query = new NpgsqlCommand(command);
-            data =  query.ExecuteReader();
+            var query = new NpgsqlCommand(command, connection);
+            data = query.ExecuteReader();
             return this;
         }
 

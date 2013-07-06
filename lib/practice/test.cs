@@ -11,13 +11,21 @@ class Test
         var connection = new NpgsqlConnection(connect);
         connection.Open();
         Table users = new Table("users", connection);
-        
-        NpgsqlCommand npgSqlCommand = new NpgsqlCommand("SELECT * FROM users", connection);
-        NpgsqlDataReader npgSqlDataReader = npgSqlCommand.ExecuteReader();
 
+        // Insert works fine.
+        //
         users.Insert("'mala', 'fia'", "name, password");
-        //users.Select("*").All();
-        Console.WriteLine("16th string");
+
+        // Select() is fine too.
+        //
+        users = users.Select("*").All();
+
+        // Print all usernames.
+        //
+        while(users.data.Read()) {
+            Console.WriteLine(users.data.GetString(1));
+        }
+
         connection.Close();
     }
 }
