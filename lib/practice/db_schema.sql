@@ -14,9 +14,15 @@ CREATE TABLE sites (
 CREATE TABLE reports (
   id serial primary key,
   site_id integer references sites(id) on update cascade,
-  pages text[],
-  rules hstore[],
+  creation_time timestamp,
   path char(250)
+);
+
+CREATE TABLE subpages (
+  id serial primary key,
+  url char(250),
+  rules hstore,
+  report_id integer references reports(id)
 );
 
 CREATE TABLE rules (
