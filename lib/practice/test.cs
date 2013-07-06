@@ -10,6 +10,8 @@ class Test
         string connect = "Server=127.0.0.1;Port=5432;User Id=s;Database=practice;";
         var connection = new NpgsqlConnection(connect);
         connection.Open();
+        if(connection.State == ConnectionState.Open) { Console.WriteLine("zbs"); }
+
         Table users = new Table("users", connection);
 
         // Insert works fine.
