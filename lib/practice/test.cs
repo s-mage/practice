@@ -18,7 +18,7 @@ class Test
 
         // Select() is fine too.
         //
-        users = users.Select("*").All();
+        users = users.Select("*").Where("id > 3").All();
 
         // Print all usernames.
         //
