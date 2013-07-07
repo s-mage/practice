@@ -10,7 +10,7 @@ namespace testApplication
 	{
 		private readonly string _url;
 		private string _content;
-		private List<String> _listOfLinks;
+		private List<String> _pages;
 
 		public string Url
 		{
@@ -27,14 +27,12 @@ namespace testApplication
 			_url = url.ToLower();
 
 			WebClient client = new WebClient();
-			_content = client.DownloadString(url);
-			_content = _content.ToLower();
-
+			_content = client.DownloadString(url).ToLower();
+			
 			if (mainPage == true)
-				_listOfLinks = GetLinksFromContentSite(_content, _url);
-			else _listOfLinks = new List<string>();
+				_pages = GetLinksFromContentSite(_content, _url);
+			else _pages = new List<string>();
 		}
-
 
 		public Report StartAnalysis()
 		{
@@ -47,7 +45,7 @@ namespace testApplication
 			ResultOfCheckPage result = new ResultOfCheckPage();
 			report.MainPageResult = this.StartPageAnalysis(Url, Content);
 
-			foreach (string page in _listOfLinks)
+			foreach (string page in _pages)
 			{
 				try
 				{
@@ -79,10 +77,10 @@ namespace testApplication
 			return result;
 		}
 
-		private List<String> GetLinksFromContentSite(string content, string url)
+		private List<String> GetPages(string content, string url)
 		{
 			url = url.TrimEnd('/');
-			List<String> listOfLinks = new List<String>();
+			List<String> pages = new List<String>();
 			string pattern = @"<a.*?href\s*=(['""][^""]*['""])";
 			Regex rgx = new Regex(pattern);
 			MatchCollection matches = rgx.Matches(content);
@@ -96,10 +94,10 @@ namespace testApplication
 				{
 					if (link[0] == '/' && link[1] == '/') continue;
 					if (link[0] == '/') link = url + link;
-					listOfLinks.Add(link);
+					pages.Add(link);
 				}
 			}
-			return listOfLinks;
+			return pages;
 		}
 
 		#region Methods for checking common rules
