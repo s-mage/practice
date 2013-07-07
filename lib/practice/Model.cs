@@ -10,6 +10,7 @@ namespace Rooletochka
         private Table users;
         private Table sites;
         private Table subpages;
+        private Table reports;
 
         public Model(NpgsqlConnection connection)
         {
@@ -17,6 +18,14 @@ namespace Rooletochka
             users = new Table("users", connection);
             sites = new Table("sites", connection);
             subpages = new Table("subpages", connection);
+        }
+
+        public int NewReport(int site_id)
+        {
+            reports.Insert(site_id.ToString(), "site_id");
+            reports.Select("lastval()").All();
+            reports.data.Read();
+            return reports.data.GetInt32(1);
         }
 
         public NpgsqlDataReader GetUrl()
