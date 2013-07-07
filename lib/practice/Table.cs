@@ -70,6 +70,18 @@ namespace Rooletochka
             return new Table(result, connection);
         }
 
+        public Table Limit(int limit)
+        {
+            string result = String.Format("{0} limit {1}",
+                    command, limit.ToString());
+            return new Table(result, connection);
+        }
+
+        public Table First()
+        {
+            return Limit(1);
+        }
+
         public void Insert(string values, string fields = "")
         {
             string query;

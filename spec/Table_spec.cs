@@ -9,6 +9,7 @@ class describe_table : nspec
     Table users;
     string name;
     string password;
+    int counter;
 
     void Initialize()
     {
@@ -29,12 +30,27 @@ class describe_table : nspec
         }
     }
 
-    void insert_should_work()
+    void BeforeWhere()
+    {
+        Initialize();
+        counter = 0;
+        users = users.Select("*").Where("id < 3").All();
+        while(users.data.Read()) { counter++; }
+    }
+
+    void insert_and_select_should_work()
     {
         before = () => BeforeInsert();
         it["When I insert something, it should be on last position"] = () =>
             name.should_be("mala");
         it["When I insert something, it should be on last position"] = () =>
             password.should_be("fia");
+    }
+
+    void where_should_work_correct()
+    {
+        before = () => BeforeWhere();
+        it["The count of rows should be less than 3"] = () =>
+            counter.should_be(2);
     }
 }

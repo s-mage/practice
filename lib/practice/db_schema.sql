@@ -4,10 +4,12 @@ CREATE TABLE users (
   password varchar(20) not null
 );
 
+CREATE TYPE state as enum ('nothing', 'data', 'report');
+
 CREATE TABLE sites (
   id serial primary key,
   url char(250) unique,
-  ready boolean default 'false'
+  ready state default 'nothing'
 );
 
 
