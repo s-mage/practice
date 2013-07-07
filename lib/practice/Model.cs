@@ -14,12 +14,17 @@ namespace Rooletochka
 
         public Model(NpgsqlConnection connection)
         {
-            if(connection.State == ConnectionState.Closed) { connection.Open(); }
+            if(connection.State == ConnectionState.Closed) { 
+                connection.Open(); 
+            }
             users = new Table("users", connection);
             sites = new Table("sites", connection);
             subpages = new Table("subpages", connection);
+            reports = new Table("reports", connection);
         }
 
+        // Add new row to table 'reports' and link it with site.
+        //
         public int NewReport(int site_id)
         {
             reports.Insert(site_id.ToString(), "site_id");
@@ -28,6 +33,8 @@ namespace Rooletochka
             return reports.data.GetInt32(1);
         }
 
+        // Get first url that needs to be processed.
+        //
         public NpgsqlDataReader GetUrl()
         {
             sites.Select("*").Where("ready = 'nothing'").First().All();
@@ -35,6 +42,9 @@ namespace Rooletochka
             return users.data;
         }
 
+        // Get first url that already analyzed but report for what is
+        // not generated.
+        //
         public NpgsqlDataReader GetUrlForReport()
         {
             sites.Select("*").Where("ready = 'data'").First().All();
@@ -43,6 +53,9 @@ namespace Rooletochka
         }
         
         
+        // Put result of analysis of one subpage to table 'subpages'
+        // and link it with report.
+        //
         public void PutRules(int reportId, string url, HashTable rules)
         {
             string hash = "";
