@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-namespace testApplication
+namespace Rooletochka
 {
 	public struct ResultOfCheckPage
 	{
