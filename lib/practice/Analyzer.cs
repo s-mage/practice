@@ -4,7 +4,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
 
-namespace testApplication
+namespace Rooletochka
 {
 	public class Analyzer
 	{
@@ -70,7 +70,9 @@ namespace testApplication
 					TagBody = CheckBodyTag(Content),
 					TagHead = CheckHeadTag(Content),
 					TagTitle = CheckTitleTags(Content),
-					TagHtml = CheckHtmlTag(Content)
+					TagHtml = CheckHtmlTag(Content),
+					InlineJS = CheckInlineJS(Content),
+					InlineCss = CheckInlineCSS(Content)
 				};
 			return result;
 		}
@@ -153,8 +155,31 @@ namespace testApplication
 
 		#endregion
 
-		#region Methods for checking Html tags
-		internal bool CheckTitleTags(string content)
+		#region Methods for checking Html tags (true - OK, false - necessary corrections)
+		private bool CheckInlineJS(string content)
+		{
+			string pattern = @"<script.*?>";
+			Regex rgx = new Regex(pattern);
+			MatchCollection matches = rgx.Matches(content);
+			foreach (Match match in matches)
+			{
+				string value = match.ToString();
+				if (value.Contains("src") && value.Contains(".js")) continue;
+				return false;
+			}
+			return true;
+		}
+
+		private bool CheckInlineCSS(string content)
+		{
+			string pattern = @"style\s*=\s*"".*?""";
+			Regex rgx = new Regex(pattern);
+			MatchCollection matches = rgx.Matches(content);
+			if (matches.Count == 0) return true;
+			return false;
+		}
+
+		private bool CheckTitleTags(string content)
 		{
 			string titleTag = "<h";
 			string closingTitleTag = "</h";

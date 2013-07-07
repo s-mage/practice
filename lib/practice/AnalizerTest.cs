@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace testApplication
+namespace Rooletochka
 {
 	internal class Program
 	{
