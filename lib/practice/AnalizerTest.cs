@@ -12,7 +12,7 @@ namespace testApplication
 			
 			Analyzer analyzer = new Analyzer(url, true);
 			Report report = new Report();
-			report = analyzer.StartAnalysis();
+			report = analyzer.Analyze();
 			Console.WriteLine("Error404 " + report.Error404);
 			Console.WriteLine("Robots " + report.RobotsTxt);
 			List<ResultOfCheckPage> list = report.ChildPagesResult;

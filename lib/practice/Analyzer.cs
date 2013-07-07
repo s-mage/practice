@@ -34,7 +34,7 @@ namespace testApplication
 			else _pages = new List<string>();
 		}
 
-		public Report StartAnalysis()
+		public Report Analyze()
 		{
 			Report report = new Report();
 			report.MainUrl = Url;
@@ -43,14 +43,14 @@ namespace testApplication
 			report.Error404 = CheckError404(Url);
 
 			ResultOfCheckPage result = new ResultOfCheckPage();
-			report.MainPageResult = this.Analyze(Url, Content);
+			report.MainPageResult = this.AnalyzePage(Url, Content);
 
 			foreach (string page in _pages)
 			{
 				try
 				{
 					Analyzer analyzer = new Analyzer(page, false);
-					result = analyzer.Analyze(analyzer.Url, analyzer.Content);
+					result = analyzer.AnalyzePage(analyzer.Url, analyzer.Content);
 					report.AddResultOfChecking(result);
 					Thread.Sleep(500);
 				}
@@ -62,7 +62,7 @@ namespace testApplication
 			return report;
 		}
 
-		private ResultOfCheckPage Analyze(string url, string content)
+		private ResultOfCheckPage AnalyzePage(string url, string content)
 		{
 			ResultOfCheckPage result = new ResultOfCheckPage
 				{
