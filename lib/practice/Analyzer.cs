@@ -30,7 +30,7 @@ namespace testApplication
 			_content = client.DownloadString(url).ToLower();
 			
 			if (mainPage == true)
-				_pages = GetLinksFromContentSite(_content, _url);
+				_pages = GetPages(_content, _url);
 			else _pages = new List<string>();
 		}
 
@@ -43,14 +43,14 @@ namespace testApplication
 			report.Error404 = CheckError404(Url);
 
 			ResultOfCheckPage result = new ResultOfCheckPage();
-			report.MainPageResult = this.StartPageAnalysis(Url, Content);
+			report.MainPageResult = this.Analyze(Url, Content);
 
 			foreach (string page in _pages)
 			{
 				try
 				{
 					Analyzer analyzer = new Analyzer(page, false);
-					result = analyzer.StartPageAnalysis(analyzer.Url, analyzer.Content);
+					result = analyzer.Analyze(analyzer.Url, analyzer.Content);
 					report.AddResultOfChecking(result);
 					Thread.Sleep(500);
 				}
@@ -58,13 +58,11 @@ namespace testApplication
 				{
 					Console.WriteLine(ex.Message);
 				}
-				
 			}
-
 			return report;
 		}
 
-		private ResultOfCheckPage StartPageAnalysis(string url, string content)
+		private ResultOfCheckPage Analyze(string url, string content)
 		{
 			ResultOfCheckPage result = new ResultOfCheckPage
 				{
