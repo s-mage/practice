@@ -6,6 +6,8 @@ using Npgsql;
 //
 namespace Rooletochka
 {
+    public enum QueryType { Insert, Select, Update, Delete };
+
     // Implements table of database, because writing sql commands
     // is not good idea.
     //
@@ -19,12 +21,14 @@ namespace Rooletochka
     {
         private string command;
         private NpgsqlConnection connection;
+        private QueryType type;
         public NpgsqlDataReader data;
 
-        public Table(string com, NpgsqlConnection con)
+        public Table(string com, NpgsqlConnection con, QueryType t = QueryType.Select)
         {
             command = com;
             connection = con;
+            type = t;
         }
 
         public Table(string com)
@@ -48,7 +52,16 @@ namespace Rooletochka
         public Table All()
         {
             var query = new NpgsqlCommand(command, connection);
-            data = query.ExecuteReader();
+
+            switch(type) {
+                case QueryType.Select:
+                    data = query.ExecuteReader();
+                    break;
+                case QueryType.Update:
+                    query.ExecuteNonQuery();
+                    break;
+            }
+
             return this;
         }
 
@@ -61,6 +74,13 @@ namespace Rooletochka
             string result = String.Format("select {0} from {1}",
                 query, command);
             return new Table(result, connection);
+        }
+
+        public Table Update(string query)
+        {
+            string result = String.Format("update {0} set {1}",
+                    command, query);
+            return new Table(result, connection, QueryType.Update);
         }
 
         public Table Where(string statement)

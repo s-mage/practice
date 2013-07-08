@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
+using Features = System.Collections.Generic.Dictionary<string, bool>;
 
 namespace Rooletochka
 {
@@ -28,8 +29,8 @@ namespace Rooletochka
 
 			WebClient client = new WebClient();
 			_content = client.DownloadString(url).ToLower();
-			
-			if (mainPage == true)
+
+			if(mainPage)
 				_pages = GetPages(_content, _url);
 			else _pages = new List<string>();
 		}
@@ -42,16 +43,16 @@ namespace Rooletochka
 			Thread.Sleep(500);
 			report.Error404 = CheckError404(Url);
 
-			ResultOfCheckPage result = new ResultOfCheckPage();
-			report.MainPageResult = this.AnalyzePage(Url, Content);
+			report.mainPageResult = this.AnalyzePage(Url);
 
+			Features result = new Features();
 			foreach (string page in _pages)
 			{
 				try
 				{
 					Analyzer analyzer = new Analyzer(page, false);
-					result = analyzer.AnalyzePage(analyzer.Url, analyzer.Content);
-					report.AddResultOfChecking(result);
+					result = analyzer.AnalyzePage(analyzer.Url);
+					report.AddCheckedPage(result, page);
 					Thread.Sleep(500);
 				}
 				catch (Exception ex)
@@ -62,18 +63,15 @@ namespace Rooletochka
 			return report;
 		}
 
-		private ResultOfCheckPage AnalyzePage(string url, string content)
+		private Features AnalyzePage(string url)
 		{
-			ResultOfCheckPage result = new ResultOfCheckPage
-				{
-					Url = url,
-					TagBody = CheckBodyTag(Content),
-					TagHead = CheckHeadTag(Content),
-					TagTitle = CheckTitleTags(Content),
-					TagHtml = CheckHtmlTag(Content),
-					InlineJS = CheckInlineJS(Content),
-					InlineCss = CheckInlineCSS(Content)
-				};
+			Features result = new Features();
+			result["tagBody"] = CheckBodyTag(Content);
+			result["tagHead"] = CheckHeadTag(Content);
+			result["tagTitle"] = CheckTitleTags(Content);
+			result["tagHtml"] = CheckHtmlTag(Content);
+			result["inlineJs"] = CheckInlineJS(Content);
+			result["inlineCss"] = CheckInlineCSS(Content);
 			return result;
 		}
 
@@ -121,8 +119,7 @@ namespace Rooletochka
 
 			bool redirect = true;
 			int statusCode = CheckStatusCode(str, redirect);
-			if (statusCode == 404) return true;
-			return false;
+			return (statusCode == 404);
 		}
 
 		private int CheckStatusCode(string url, bool redirect)

@@ -2,6 +2,7 @@ using System;
 using Npgsql;
 using System.Data;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Rooletochka
 {
@@ -14,8 +15,8 @@ namespace Rooletochka
 
         public Model(NpgsqlConnection connection)
         {
-            if(connection.State == ConnectionState.Closed) { 
-                connection.Open(); 
+            if(connection.State == ConnectionState.Closed) {
+                connection.Open();
             }
             users = new Table("users", connection);
             sites = new Table("sites", connection);
@@ -51,17 +52,18 @@ namespace Rooletochka
             users.data.Read();
             return users.data;
         }
-        
-        
+
+
         // Put result of analysis of one subpage to table 'subpages'
         // and link it with report.
         //
-        public void PutRules(int reportId, string url, HashTable rules)
+        public void PutRules(int reportId, string url,
+            Dictionary<string, bool> rules)
         {
             string hash = "";
-            foreach(DictionaryEntry item in rules) {
-                hash += String.Format("{0} => {1}", 
-                    item.Key.ToString(), item.Value.ToString());
+            foreach(KeyValuePair<string, bool> item in rules) {
+                hash += String.Format("'{0}' => {1}",
+                    item.Key, item.Value.ToString());
             }
             string values = String.Format("'{0}', '{1}', {2}",
                 url, hash, reportId.ToString());

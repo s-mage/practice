@@ -1,62 +1,59 @@
 ﻿using System.Collections.Generic;
+using Features = System.Collections.Generic.Dictionary<string, bool>;
+
 namespace Rooletochka
 {
-	public struct ResultOfCheckPage
-	{
-		public bool InlineJS;
-		public bool InlineCss;
-		public bool TagHtml;
-		public bool TagHead;
-		public bool TagBody;
-		public bool TagTitle;
-		public string Url;
-	}
-
 	public class Report
 	{
-		private string _mainUrl;
-		private bool _robotsTxtStatus;
-		private bool _error404Status;
-		private bool _redirectStatus;
-		private List<ResultOfCheckPage> _listChildPages;
-		public ResultOfCheckPage MainPageResult;
+		private string mainUrl;
+
+		// Common features are:
+		//   robotsTxt, error404, redirect.
+		//
+		private Features commonFeatures;
+
+		// Specific for each page features are:
+		//  inlineJs, inlineCss, tagHtml, tagHead, tagBody, tagTitle, url.
+		//
+		private Dictionary<string, Features> specificFeatures;
+
+		// Features for main page.
+		//
+		public Features mainPageResult;
 
 		public Report()
 		{
-			_mainUrl = "";
-			_robotsTxtStatus = false;
-			_error404Status = false;
-			_redirectStatus = false;
-			_listChildPages = new List<ResultOfCheckPage>();
+			mainUrl = "";
+			commonFeatures = new Dictionary<string, bool>();
+			specificFeatures = new Dictionary<string, Dictionary<string, bool>>();
+			mainPageResult = new Dictionary<string, bool>();
 		}
 
-		public List<ResultOfCheckPage> ChildPagesResult {
-			get { return _listChildPages; }
+		public Dictionary<string, Features> SpecificFeatures {
+			get { return specificFeatures; }
 		}
 
 		public bool RobotsTxt {
-			get { return _robotsTxtStatus; }
-			set { _robotsTxtStatus = value; }
+			get { return commonFeatures["robotsTxt"]; }
+			set { commonFeatures["robotsTxt"] = value; }
 		}
 		public bool Error404 {
-			get { return _error404Status; }
-			set { _error404Status = value; }
+			get { return commonFeatures["error404"]; }
+			set { commonFeatures["error404"] = value; }
 		}
 		public bool Redirect {
-			get { return _redirectStatus; }
-			set { _redirectStatus = value; }
+			get { return commonFeatures["redirect"]; }
+			set { commonFeatures["redirect"] = value; }
 		}
 		public string MainUrl
 		{
-			get { return _mainUrl; }
-			set { _mainUrl = value; }
+			get { return mainUrl; }
+			set { mainUrl = value; }
 		}
 
-		public void AddResultOfChecking(ResultOfCheckPage result)
+		public void AddCheckedPage(Features result, string url)
 		{
-			_listChildPages.Add(result);
+			specificFeatures.Add(url, result);
 		}
-
 	}
-
 }
