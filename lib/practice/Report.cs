@@ -13,6 +13,10 @@ namespace Rooletochka
 
 		private string mainUrl;
 
+		// Features for main page.
+		//
+		public Features mainPageResult;
+
 		// Common features are:
 		//   robotsTxt, error404, redirect.
 		//
@@ -21,21 +25,39 @@ namespace Rooletochka
 		// Specific for each page features are:
 		//  inlineJs, inlineCss, tagHtml, tagHead, tagBody, tagTitle, url.
 		//
-		private Dictionary<string, Features> specificFeatures;
+		private List<Page> specificFeatures;
 
-		// Features for main page.
-		//
-		public Features mainPageResult;
+		// Class for store features of page. Consists of URL of page
+		// and it's features.
+		public class Page
+		{
+			private string url;
+			private Features features;
+
+			public Page(string uri, Features f)
+			{
+				url = uri;
+				features = f;
+			}
+
+			public string URL {
+				get { return url; }
+			}
+
+			public Features Features {
+				get { return features; }
+			}
+		}
 
 		public Report()
 		{
 			mainUrl = "";
 			commonFeatures = new Dictionary<string, bool>();
-			specificFeatures = new Dictionary<string, Features>();
+			specificFeatures = new List<Page>();
 			mainPageResult = new Dictionary<string, bool>();
 		}
 
-		public Dictionary<string, Features> SpecificFeatures {
+		public List<Page> SpecificFeatures {
 			get { return specificFeatures; }
 		}
 
@@ -57,9 +79,10 @@ namespace Rooletochka
 			set { mainUrl = value; }
 		}
 
-		public void AddCheckedPage(Features result, string url)
+		public void AddCheckedPage(Features features, string url)
 		{
-			specificFeatures.Add(url, result);
+			Page page = new Page(url, features);
+			specificFeatures.Add(page);
 		}
 	}
 }
