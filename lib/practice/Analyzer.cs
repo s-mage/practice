@@ -204,38 +204,30 @@ namespace Rooletochka {
 			return false;
 		}
 
-		private bool CheckTitleTags(string content) {
-			string titleTag = "<h";
-			string closingTitleTag = "</h";
-			for (int i = 0; i < 6; i++) {
-				if (content.Contains(titleTag + i) && content.Contains(closingTitleTag + i))
-					return true;
+		private bool CheckTitleTags() {
+			for (int i=0; i<6; i++) {
+				if (CheckTag("h"+i)) { return true; }
 			}
 			return false;
 		}
 
-		private bool CheckHtmlTag(string content) {
-			string openHeadTag = "<html";
-			string closingHeadTag = "</html>";
-			if ((content.Contains(openHeadTag) && content.Contains(closingHeadTag)) == true)
-				return true;
-			return false;
+		private bool CheckHtmlTag() {
+			return CheckTag("html");
 		}
 
-		private bool CheckBodyTag(string content) {
-			string openBodyTag = "<body";
-			string closingBodyTag = "</body>";
-			if ((content.Contains(openBodyTag) && content.Contains(closingBodyTag)) == true)
-				return true;
-			return false;
+		private bool CheckBodyTag() {
+			return CheckTag("body");
 		}
 
-		private bool CheckHeadTag(string content) {
-			string openHeadTag = "<head";
-			string closingHeadTag = "</head>";
-			if ((content.Contains(openHeadTag) && content.Contains(closingHeadTag)) == true)
-				return true;
-			return false;
+		private bool CheckHeadTag() {
+			return CheckTag("head");
+		}
+
+		// Check page for opening and closing tags.
+		// Example: CheckTag("html") will check page for <html> and </html>.
+		//
+		private bool CheckTag(string tag) {
+			return content.Contains("<"+tag)&&content.Contains("</"+tag+">");
 		}
 
 		#endregion
