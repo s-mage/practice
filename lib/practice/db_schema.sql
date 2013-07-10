@@ -23,7 +23,7 @@ CREATE TABLE reports (
 CREATE TABLE subpages (
   id serial primary key,
   url char(250),
-  rules hstore,
+  rules json,
   report_id integer references reports(id)
 );
 

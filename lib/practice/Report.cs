@@ -5,6 +5,12 @@ namespace Rooletochka
 {
 	public class Report
 	{
+		// Names of common features.
+		//
+		private const string ROBOTS_TXT = "robotsTxt";
+		private const string ERROR_404 = "error404";
+		private const string REDIRECT = "redirect";
+
 		private string mainUrl;
 
 		// Common features are:
@@ -25,7 +31,7 @@ namespace Rooletochka
 		{
 			mainUrl = "";
 			commonFeatures = new Dictionary<string, bool>();
-			specificFeatures = new Dictionary<string, Dictionary<string, bool>>();
+			specificFeatures = new Dictionary<string, Features>();
 			mainPageResult = new Dictionary<string, bool>();
 		}
 
@@ -34,16 +40,16 @@ namespace Rooletochka
 		}
 
 		public bool RobotsTxt {
-			get { return commonFeatures["robotsTxt"]; }
-			set { commonFeatures["robotsTxt"] = value; }
+			get { return commonFeatures[ROBOTS_TXT]; }
+			set { commonFeatures[ROBOTS_TXT] = value; }
 		}
 		public bool Error404 {
-			get { return commonFeatures["error404"]; }
-			set { commonFeatures["error404"] = value; }
+			get { return commonFeatures[ERROR_404]; }
+			set { commonFeatures[ERROR_404] = value; }
 		}
 		public bool Redirect {
-			get { return commonFeatures["redirect"]; }
-			set { commonFeatures["redirect"] = value; }
+			get { return commonFeatures[REDIRECT]; }
+			set { commonFeatures[REDIRECT] = value; }
 		}
 		public string MainUrl
 		{

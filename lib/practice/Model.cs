@@ -3,6 +3,7 @@ using Npgsql;
 using System.Data;
 using System.Collections;
 using System.Collections.Generic;
+using ServiceStack.Text;
 
 namespace Rooletochka
 {
@@ -26,21 +27,22 @@ namespace Rooletochka
 
         // Add new row to table 'reports' and link it with site.
         //
-        public int NewReport(int site_id)
+        public long NewReport(int site_id)
         {
             reports.Insert(site_id.ToString(), "site_id");
-            reports.Select("lastval()").All();
-            reports.data.Read();
-            return reports.data.GetInt32(1);
+            Table result = reports.Select("lastval()").All();
+            result.data.Read();
+            return result.data.GetInt64(0);
         }
 
         // Get first url that needs to be processed.
         //
         public NpgsqlDataReader GetUrl()
         {
-            sites.Select("*").Where("ready = 'nothing'").First().All();
-            users.data.Read();
-            return users.data;
+            Table result = sites.Select("*").Where("ready = 'nothing'").
+                First().All();
+            result.data.Read();
+            return result.data;
         }
 
         // Get first url that already analyzed but report for what is
@@ -48,9 +50,10 @@ namespace Rooletochka
         //
         public NpgsqlDataReader GetUrlForReport()
         {
-            sites.Select("*").Where("ready = 'data'").First().All();
-            users.data.Read();
-            return users.data;
+            Table result = sites.Select("*").Where("ready = 'data'").
+                First().All();
+            result.data.Read();
+            return result.data;
         }
 
 
@@ -60,13 +63,8 @@ namespace Rooletochka
         public void PutRules(int reportId, string url,
             Dictionary<string, bool> rules)
         {
-            string hash = "";
-            foreach(KeyValuePair<string, bool> item in rules) {
-                hash += String.Format("'{0}' => {1}",
-                    item.Key, item.Value.ToString());
-            }
             string values = String.Format("'{0}', '{1}', {2}",
-                url, hash, reportId.ToString());
+                url, rules.ToJson(), reportId.ToString());
             subpages.Insert(values, "url, rules, report_id");
         }
     }

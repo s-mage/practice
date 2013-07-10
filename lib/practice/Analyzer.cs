@@ -9,30 +9,42 @@ namespace Rooletochka
 {
 	public class Analyzer
 	{
-		private readonly string _url;
-		private string _content;
-		private List<String> _pages;
+		// Count of analyzed pages.
+		//
+		private const int COUNT_OF_PAGES = 10;
+
+		// Names of features for each page on site.
+		//
+		private const string TAG_BODY = "tagBody";
+		private const string TAG_HTML = "tagHtml";
+		private const string TAG_HEAD = "tagHead";
+		private const string TAG_TITLE = "tagTitle";
+		private const string INLINE_JS = "inlineJs";
+		private const string INLINE_CSS = "inlineCss";
+
+		private readonly string url;
+		private string content;
+		private List<String> pages;
 
 		public string Url
 		{
-			get { return _url; }
+			get { return url; }
 		}
 
 		public string Content
 		{
-			get { return _content; }
+			get { return content; }
 		}
 
-		public Analyzer(string url, bool mainPage)
+		public Analyzer(string uri, bool mainPage)
 		{
-			_url = url.ToLower();
+			url = uri.ToLower();
 
 			WebClient client = new WebClient();
-			_content = client.DownloadString(url).ToLower();
+			content = client.DownloadString(url).ToLower();
 
-			if(mainPage)
-				_pages = GetPages(_content, _url);
-			else _pages = new List<string>();
+			if(mainPage) { pages = GetPages(content, url); }
+			else { pages = new List<string>(); }
 		}
 
 		public Report Analyze()
@@ -43,10 +55,10 @@ namespace Rooletochka
 			Thread.Sleep(500);
 			report.Error404 = CheckError404(Url);
 
-			report.mainPageResult = this.AnalyzePage(Url);
+			report.mainPageResult = AnalyzePage(Url);
 
 			Features result = new Features();
-			foreach (string page in _pages)
+			foreach (string page in pages)
 			{
 				try
 				{
@@ -63,15 +75,17 @@ namespace Rooletochka
 			return report;
 		}
 
+		// Analyze one page of site.
+		//
 		private Features AnalyzePage(string url)
 		{
 			Features result = new Features();
-			result["tagBody"] = CheckBodyTag(Content);
-			result["tagHead"] = CheckHeadTag(Content);
-			result["tagTitle"] = CheckTitleTags(Content);
-			result["tagHtml"] = CheckHtmlTag(Content);
-			result["inlineJs"] = CheckInlineJS(Content);
-			result["inlineCss"] = CheckInlineCSS(Content);
+			result[TAG_BODY] = CheckBodyTag();
+			result[TAG_HEAD] = CheckHeadTag();
+			result[TAG_TITLE] = CheckTitleTags();
+			result[TAG_HTML] = CheckHtmlTag();
+			result[INLINE_JS] = CheckInlineJS();
+			result[INLINE_CSS] = CheckInlineCSS();
 			return result;
 		}
 
@@ -82,19 +96,22 @@ namespace Rooletochka
 			string pattern = @"<a.*?href\s*=(['""][^""]*['""])";
 			Regex rgx = new Regex(pattern);
 			MatchCollection matches = rgx.Matches(content);
+
 			foreach (Match match in matches)
 			{
 				string link = Regex.Replace(match.ToString(),
-				                            @"<a.*?href\s*=(['""][^""]*['""])", @"$1",
-				                            RegexOptions.IgnoreCase);
+					@"<a.*?href\s*=(['""][^""]*['""])", @"$1", RegexOptions.IgnoreCase);
 				link = link.Trim("\"".ToCharArray());
 				if (link.Length > 2 && (link[0] == '/' || link.Contains(url)))
 				{
 					if (link[0] == '/' && link[1] == '/') continue;
 					if (link[0] == '/') link = url + link;
 					pages.Add(link);
+
+					if(pages.Count == COUNT_OF_PAGES) { return pages; }
 				}
 			}
+
 			return pages;
 		}
 
@@ -152,8 +169,8 @@ namespace Rooletochka
 
 		#endregion
 
-		#region Methods for checking Html tags (true - OK, false - necessary corrections)
-		private bool CheckInlineJS(string content)
+		#region Methods for checking Html tags (true - OK, false - page needs corrections)
+		private bool CheckInlineJS()
 		{
 			string pattern = @"<script.*?>";
 			Regex rgx = new Regex(pattern);
@@ -167,7 +184,7 @@ namespace Rooletochka
 			return true;
 		}
 
-		private bool CheckInlineCSS(string content)
+		private bool CheckInlineCSS()
 		{
 			string pattern = @"style\s*=\s*"".*?""";
 			Regex rgx = new Regex(pattern);
@@ -176,43 +193,35 @@ namespace Rooletochka
 			return false;
 		}
 
-		private bool CheckTitleTags(string content)
+		private bool CheckTitleTags()
 		{
-			string titleTag = "<h";
-			string closingTitleTag = "</h";
-			for (int i = 0; i < 6; i++)
-			{
-				if (content.Contains(titleTag + i) && content.Contains(closingTitleTag + i))
-					return true;
+			for (int i = 0; i < 6; i++) {
+				if (CheckTag("h" + i)) { return true; }
 			}
 			return false;
 		}
 
-		private bool CheckHtmlTag(string content)
+		private bool CheckHtmlTag()
 		{
-			string openHeadTag = "<html";
-			string closingHeadTag = "</html>";
-			if ((content.Contains(openHeadTag) && content.Contains(closingHeadTag)) == true)
-				return true;
-			return false;
+			return CheckTag("html");
 		}
 
-		private bool CheckBodyTag(string content)
+		private bool CheckBodyTag()
 		{
-			string openBodyTag = "<body";
-			string closingBodyTag = "</body>";
-			if ((content.Contains(openBodyTag) && content.Contains(closingBodyTag)) == true)
-				return true;
-			return false;
+			return CheckTag("body");
 		}
 
-		private bool CheckHeadTag(string content)
+		private bool CheckHeadTag()
 		{
-			string openHeadTag = "<head";
-			string closingHeadTag = "</head>";
-			if ((content.Contains(openHeadTag) && content.Contains(closingHeadTag)) == true)
-				return true;
-			return false;
+			return CheckTag("head");
+		}
+
+		// Check page for opening and closing tags.
+		// Example: CheckTag("html") will check page for <html> and </html>.
+		//
+		private bool CheckTag(string tag)
+		{
+			return content.Contains("<" + tag) && content.Contains("</" + tag + ">");
 		}
 
 		#endregion

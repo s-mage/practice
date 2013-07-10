@@ -46,7 +46,7 @@ namespace Rooletochka
             command = com;
         }
 
-        // Initialize data field. It should be initialized once, 
+        // Initialize data field. It should be initialized once,
         // or it would be slow as I don't know what.
         //
         public Table All()
@@ -85,16 +85,16 @@ namespace Rooletochka
 
         public Table Where(string statement)
         {
-            string result = String.Format("{0} where ({1})",
+            string result = String.Format("{0} where {1}",
                 command, statement);
-            return new Table(result, connection);
+            return new Table(result, connection, type);
         }
 
         public Table Limit(int limit)
         {
             string result = String.Format("{0} limit {1}",
                     command, limit.ToString());
-            return new Table(result, connection);
+            return new Table(result, connection, type);
         }
 
         public Table First()
