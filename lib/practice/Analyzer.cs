@@ -3,9 +3,19 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
+using Features=System.Collections.Generic.Dictionary<string, bool>;
 
 namespace Rooletochka {
 	public class Analyzer {
+		// Names of features for each page on site.
+		//
+		private const string TAG_BODY="tagBody";
+		private const string TAG_HTML="tagHtml";
+		private const string TAG_HEAD="tagHead";
+		private const string TAG_TITLE="tagTitle";
+		private const string INLINE_JS="inlineJs";
+		private const string INLINE_CSS="inlineCss";
+		
 		private const byte MAX_CHILD_PAGE_IN_REPORT = 15;
 		private readonly string _url;
 		private readonly string _content;
@@ -38,15 +48,16 @@ namespace Rooletochka {
 			Thread.Sleep(500);
 			report.Error404 = CheckError404(Url);
 
-			ResultOfCheckPage result = new ResultOfCheckPage();
-			report.MainPageResult = this.AnalyzePage(Url);
-
+			report.mainPageResult = this.AnalyzePage(Url);
+			Features result=new Features();
+			int count = 0;
 			foreach (string page in _pages) {
 				try {
 					Analyzer analyzer = new Analyzer(page, false);
 					result = analyzer.AnalyzePage(analyzer.Url);
-					report.AddCheckedPage(result);
-					if (report.ChildPagesResult.Count == MAX_CHILD_PAGE_IN_REPORT) break;
+					report.AddCheckedPage(result, page);
+					count++;
+					if (count == MAX_CHILD_PAGE_IN_REPORT) break;
 					Thread.Sleep(500);
 				}
 				catch (Exception ex) {
@@ -55,7 +66,7 @@ namespace Rooletochka {
 			}
 			return report;
 		}
-
+		
 		private bool IsCorrectURL(string url) {
 			Uri correctUrl;
 			if (Uri.TryCreate(url, UriKind.Absolute, out correctUrl) &&
@@ -85,17 +96,16 @@ namespace Rooletochka {
 			return true;
 		}
 
-		private ResultOfCheckPage AnalyzePage(string url) {
-			ResultOfCheckPage result = new ResultOfCheckPage
-				{
-					Url = url,
-					TagBody = CheckBodyTag(Content),
-					TagHead = CheckHeadTag(Content),
-					TagTitle = CheckTitleTags(Content),
-					TagHtml = CheckHtmlTag(Content),
-					InlineJS = CheckInlineJS(Content),
-					InlineCss = CheckInlineCSS(Content)
-				};
+		// Analyze one page of site.
+		//
+		private Features AnalyzePage(string url) {
+			Features result=new Features();
+			result[TAG_BODY]=CheckBodyTag();
+			result[TAG_HEAD]=CheckHeadTag();
+			result[TAG_TITLE]=CheckTitleTags();
+			result[TAG_HTML]=CheckHtmlTag();
+			result[INLINE_JS]=CheckInlineJS();
+			result[INLINE_CSS]=CheckInlineCSS();
 			return result;
 		}
 
@@ -184,10 +194,10 @@ namespace Rooletochka {
 
 		#region Methods for checking Html tags (true - OK, false - necessary corrections)
 
-		private bool CheckInlineJS(string content) {
+		private bool CheckInlineJS() {
 			string pattern = @"<script.*?>";
 			Regex rgx = new Regex(pattern);
-			MatchCollection matches = rgx.Matches(content);
+			MatchCollection matches = rgx.Matches(Content);
 			foreach (Match match in matches) {
 				string value = match.ToString();
 				if (value.Contains("src") && value.Contains(".js")) continue;
@@ -196,10 +206,10 @@ namespace Rooletochka {
 			return true;
 		}
 
-		private bool CheckInlineCSS(string content) {
+		private bool CheckInlineCSS() {
 			string pattern = @"style\s*=\s*"".*?""";
 			Regex rgx = new Regex(pattern);
-			MatchCollection matches = rgx.Matches(content);
+			MatchCollection matches = rgx.Matches(Content);
 			if (matches.Count == 0) return true;
 			return false;
 		}
@@ -227,7 +237,7 @@ namespace Rooletochka {
 		// Example: CheckTag("html") will check page for <html> and </html>.
 		//
 		private bool CheckTag(string tag) {
-			return content.Contains("<"+tag)&&content.Contains("</"+tag+">");
+			return Content.Contains("<"+tag) && Content.Contains("</"+tag+">");
 		}
 
 		#endregion
