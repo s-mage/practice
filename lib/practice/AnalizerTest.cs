@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Rooletochka
-{
-	internal class Program
-	{
-		private static void Main(string[] args)
-		{
-			string url = "http://d3.ru/";
+namespace Rooletochka {
+	internal class Program {
+		private static void Main(string[] args) {
+			string url="http://habrahabr.ru/";
 			//TODO get url from bd
-			
+
 			Analyzer analyzer = new Analyzer(url, true);
 			Report report = new Report();
 			report = analyzer.Analyze();

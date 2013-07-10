@@ -52,7 +52,7 @@ namespace Rooletochka
 			set { _mainUrl = value; }
 		}
 
-		public void AddResultOfChecking(ResultOfCheckPage result)
+		public void AddCheckedPage(ResultOfCheckPage result)
 		{
 			_listChildPages.Add(result);
 		}
