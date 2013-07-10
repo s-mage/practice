@@ -6,6 +6,8 @@ using Npgsql;
 //
 namespace Rooletochka
 {
+    public enum QueryType { Insert, Select, Update, Delete };
+
     // Implements table of database, because writing sql commands
     // is not good idea.
     //
@@ -19,12 +21,14 @@ namespace Rooletochka
     {
         private string command;
         private NpgsqlConnection connection;
+        private QueryType type;
         public NpgsqlDataReader data;
 
-        public Table(string com, NpgsqlConnection con)
+        public Table(string com, NpgsqlConnection con, QueryType t = QueryType.Select)
         {
             command = com;
             connection = con;
+            type = t;
         }
 
         public Table(string com)
@@ -42,13 +46,22 @@ namespace Rooletochka
             command = com;
         }
 
-        // Initialize data field. It should be initialized once, 
+        // Initialize data field. It should be initialized once,
         // or it would be slow as I don't know what.
         //
         public Table All()
         {
             var query = new NpgsqlCommand(command, connection);
-            data = query.ExecuteReader();
+
+            switch(type) {
+                case QueryType.Select:
+                    data = query.ExecuteReader();
+                    break;
+                case QueryType.Update:
+                    query.ExecuteNonQuery();
+                    break;
+            }
+
             return this;
         }
 
@@ -63,18 +76,25 @@ namespace Rooletochka
             return new Table(result, connection);
         }
 
+        public Table Update(string query)
+        {
+            string result = String.Format("update {0} set {1}",
+                    command, query);
+            return new Table(result, connection, QueryType.Update);
+        }
+
         public Table Where(string statement)
         {
-            string result = String.Format("{0} where ({1})",
+            string result = String.Format("{0} where {1}",
                 command, statement);
-            return new Table(result, connection);
+            return new Table(result, connection, type);
         }
 
         public Table Limit(int limit)
         {
             string result = String.Format("{0} limit {1}",
                     command, limit.ToString());
-            return new Table(result, connection);
+            return new Table(result, connection, type);
         }
 
         public Table First()
