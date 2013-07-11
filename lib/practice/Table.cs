@@ -4,8 +4,7 @@ using Npgsql;
 
 // Rooletochka is just like Rooletka, but a little smaller.
 //
-namespace Rooletochka
-{
+namespace Rooletochka {
     public enum QueryType { Insert, Select, Update, Delete };
 
     // Implements table of database, because writing sql commands
@@ -17,22 +16,20 @@ namespace Rooletochka
     // It looks evident to implement class Table and some common
     // methods, such as select and insert.
     //
-    public class Table
-    {
+    public class Table {
         private string command;
         private NpgsqlConnection connection;
         private QueryType type;
         public NpgsqlDataReader data;
 
-        public Table(string com, NpgsqlConnection con, QueryType t = QueryType.Select)
-        {
+        public Table(string com, NpgsqlConnection con,
+            QueryType t = QueryType.Select) {
             command = com;
             connection = con;
             type = t;
         }
 
-        public Table(string com)
-        {
+        public Table(string com) {
             Console.Write("User Id: ");
             string userId = Console.ReadLine();
 
@@ -49,8 +46,7 @@ namespace Rooletochka
         // Initialize data field. It should be initialized once,
         // or it would be slow as I don't know what.
         //
-        public Table All()
-        {
+        public Table All() {
             var query = new NpgsqlCommand(command, connection);
 
             switch(type) {
@@ -61,7 +57,6 @@ namespace Rooletochka
                     query.ExecuteNonQuery();
                     break;
             }
-
             return this;
         }
 
@@ -69,41 +64,35 @@ namespace Rooletochka
         // myAwesomeTable.Select("*").All() instead of
         // NpgsqlCommand("select * from myAwesomeTable", connection).
         //
-        public Table Select(string query)
-        {
+        public Table Select(string query) {
             string result = String.Format("select {0} from {1}",
                 query, command);
             return new Table(result, connection);
         }
 
-        public Table Update(string query)
-        {
+        public Table Update(string query) {
             string result = String.Format("update {0} set {1}",
                     command, query);
             return new Table(result, connection, QueryType.Update);
         }
 
-        public Table Where(string statement)
-        {
+        public Table Where(string statement) {
             string result = String.Format("{0} where {1}",
                 command, statement);
             return new Table(result, connection, type);
         }
 
-        public Table Limit(int limit)
-        {
+        public Table Limit(int limit) {
             string result = String.Format("{0} limit {1}",
                     command, limit.ToString());
             return new Table(result, connection, type);
         }
 
-        public Table First()
-        {
+        public Table First() {
             return Limit(1);
         }
 
-        public void Insert(string values, string fields = "")
-        {
+        public void Insert(string values, string fields = "") {
             string query;
 
             if(fields == "") {

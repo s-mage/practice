@@ -1,21 +1,18 @@
 using System;
-using Npgsql;
 using System.Data;
 using System.Collections;
 using System.Collections.Generic;
 using ServiceStack.Text;
+using Npgsql;
 
-namespace Rooletochka
-{
-    class Model
-    {
+namespace Rooletochka {
+    class Model {
         private Table users;
         private Table sites;
         private Table subpages;
         private Table reports;
 
-        public Model(NpgsqlConnection connection)
-        {
+        public Model(NpgsqlConnection connection) {
             if(connection.State == ConnectionState.Closed) {
                 connection.Open();
             }
@@ -27,8 +24,7 @@ namespace Rooletochka
 
         // Add new row to table 'reports' and link it with site.
         //
-        public long NewReport(int site_id)
-        {
+        public long NewReport(int site_id) {
             reports.Insert(site_id.ToString(), "site_id");
             Table result = reports.Select("lastval()").All();
             result.data.Read();
@@ -37,8 +33,7 @@ namespace Rooletochka
 
         // Get first url that needs to be processed.
         //
-        public NpgsqlDataReader GetUrl()
-        {
+        public NpgsqlDataReader GetUrl() {
             Table result = sites.Select("*").Where("ready = 'nothing'").
                 First().All();
             result.data.Read();
@@ -48,8 +43,7 @@ namespace Rooletochka
         // Get first url that already analyzed but report for what is
         // not generated.
         //
-        public NpgsqlDataReader GetUrlForReport()
-        {
+        public NpgsqlDataReader GetUrlForReport() {
             Table result = sites.Select("*").Where("ready = 'data'").
                 First().All();
             result.data.Read();
@@ -61,8 +55,7 @@ namespace Rooletochka
         // and link it with report.
         //
         public void PutRules(int reportId, string url,
-            Dictionary<string, bool> rules)
-        {
+            Dictionary<string, bool> rules) {
             string values = String.Format("'{0}', '{1}', {2}",
                 url, rules.ToJson(), reportId.ToString());
             subpages.Insert(values, "url, rules, report_id");
