@@ -8,8 +8,8 @@ namespace Rooletochka {
     internal class Program {
         public static Model CreateModel() {
             string connect = "Server=127.0.0.1;Port=5432;User Id=s;Database=practice;";
-      var connection = new NpgsqlConnection(connect);
-      return new Model(connection);
+            var connection = new NpgsqlConnection(connect);
+            return new Model(connection);
         }
 
         // Let's test!
