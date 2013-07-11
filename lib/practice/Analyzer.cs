@@ -29,7 +29,7 @@ namespace Rooletochka {
             get { return _content; }
         }
 
-        public Analyzer(string url, bool isMainPage) {
+        public Analyzer(string url, bool isMainPage = true) {
             _url = NormalizeUrl(url);
 
             if (IsCorrectURL(_url)) {
@@ -57,8 +57,8 @@ namespace Rooletochka {
             return url.Remove(length).ToLower();
         }
 
-        public Report Analyze() {
-            Report report = new Report();
+        public Report Analyze(long reportId) {
+            Report report = new Report(reportId);
             report.MainUrl = Url;
             report.RobotsTxt = CheckRobotsTxt(Url);
             Thread.Sleep(500);

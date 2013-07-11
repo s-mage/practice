@@ -9,6 +9,15 @@ namespace Rooletochka {
         private const string ERROR_404 = "error404";
         private const string REDIRECT = "redirect";
 
+        // String for indicate common features at database.
+        private const string FEATURES = "Common Features";
+
+        // Id of report in database.
+        //
+        private long id;
+
+        // URL of main page.
+        //
         private string mainUrl;
 
         // Features for main page.
@@ -37,7 +46,7 @@ namespace Rooletochka {
                 features = f;
             }
 
-            public string URL {
+            public string Url {
                 get { return url; }
             }
 
@@ -51,6 +60,18 @@ namespace Rooletochka {
             commonFeatures = new Dictionary<string, bool>();
             specificFeatures = new List<Page>();
             mainPageResult = new Dictionary<string, bool>();
+        }
+
+        public Report(long reportId) : this() {
+            id = reportId;
+        }
+
+        public Report(Model model, int siteId) : this() {
+            id = model.NewReport(siteId);
+        }
+
+        public long Id {
+            get { return id; }
         }
 
         public List<Page> SpecificFeatures {
@@ -78,6 +99,15 @@ namespace Rooletochka {
         public void AddCheckedPage(Features features, string url) {
             Page page = new Page(url, features);
             specificFeatures.Add(page);
+        }
+
+        public void PutIntoDB(Model model, int siteId) {
+            model.PutRules(id, FEATURES, commonFeatures);
+            model.PutRules(id, mainUrl, mainPageResult);
+            foreach(Page page in specificFeatures) {
+                model.PutRules(id, page.Url, page.Features);
+            }
+            model.DataIsReady(siteId);
         }
     }
 }

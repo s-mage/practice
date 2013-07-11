@@ -6,7 +6,7 @@ using ServiceStack.Text;
 using Npgsql;
 
 namespace Rooletochka {
-    class Model {
+    public class Model {
         private Table users;
         private Table sites;
         private Table subpages;
@@ -24,8 +24,8 @@ namespace Rooletochka {
 
         // Add new row to table 'reports' and link it with site.
         //
-        public long NewReport(int site_id) {
-            reports.Insert(site_id.ToString(), "site_id");
+        public long NewReport(int siteId) {
+            reports.Insert(siteId.ToString(), "site_id");
             Table result = reports.Select("lastval()").All();
             result.data.Read();
             return result.data.GetInt64(0);
@@ -54,11 +54,17 @@ namespace Rooletochka {
         // Put result of analysis of one subpage to table 'subpages'
         // and link it with report.
         //
-        public void PutRules(int reportId, string url,
+        public void PutRules(long reportId, string url,
             Dictionary<string, bool> rules) {
             string values = String.Format("'{0}', '{1}', {2}",
                 url, rules.ToJson(), reportId.ToString());
             subpages.Insert(values, "url, rules, report_id");
+        }
+
+        // Update field 'ready' to value 'data' for given id of site.
+        //
+        public void DataIsReady(int siteId) {
+            sites.Update("ready = 'data'").Where("id = " + siteId).All();
         }
     }
 }
