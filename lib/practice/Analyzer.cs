@@ -47,7 +47,7 @@ namespace Rooletochka {
         // so it looks necessary to lead input URL to some standart form.
         //
         private string NormalizeUrl(string url) {
-            int length;
+            int length = 0;
             for(int i = url.Length - 1; i >= 0; i--) {
                 if (url[i] != ' ') {
                     length = (url[i] == '/') ? i : i + 1;
