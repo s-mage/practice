@@ -76,9 +76,9 @@ namespace Rooletochka {
             return new Table(result, connection, QueryType.Update);
         }
 
-        public Table Where(string statement) {
+        public Table Where(string condition) {
             string result = String.Format("{0} where {1}",
-                command, statement);
+                command, condition);
             return new Table(result, connection, type);
         }
 
@@ -90,6 +90,12 @@ namespace Rooletochka {
 
         public Table First() {
             return Limit(1);
+        }
+
+        public Table Order(string condition) {
+            string result = String.Format("{0} order by ({1})",
+                command, condition);
+            return new Table(result, connection, type);
         }
 
         public void Insert(string values, string fields = "") {

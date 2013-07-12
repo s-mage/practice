@@ -10,6 +10,7 @@ namespace Rooletochka {
         private Table sites;
         private Table subpages;
         private Table reports;
+        private Table rules;
 
         public Model(NpgsqlConnection connection) {
             if(connection.State == ConnectionState.Closed) {
@@ -19,6 +20,7 @@ namespace Rooletochka {
             sites = new Table("sites", connection);
             subpages = new Table("subpages", connection);
             reports = new Table("reports", connection);
+            rules = new Table("rules", connection);
         }
 
         // Add new row to table 'reports' and link it with site.
@@ -47,6 +49,32 @@ namespace Rooletochka {
                 First().All();
             result.data.Read();
             return result.data;
+        }
+
+        // Get last report id given site id.
+        //
+        public int GetReportId(int siteId) {
+            string condition = "site_id  = " + siteId;
+            Table result = reports.Select("id").Where(condition).Order("-id").
+                First().All();
+            if (result.data.Read()) { return result.data.GetInt32(0); }
+            return 0;
+        }
+
+        // Get URLs and rules for subpages linked with given reportId.
+        //
+        public NpgsqlDataReader GetSubpages(int reportId) {
+            string condition = "report_id = " + reportId;
+            return subpages.Select("url, rules").Where(condition).All().data;
+        }
+
+        // Get explanation of rule given it name.
+        //
+        public string Explain(string rule) {
+            Table result = rules.Select("message").Where("name = " + rule).
+                First().All();
+            if (result.data.Read()) { return result.data.GetString(0); }
+            return "";
         }
 
 

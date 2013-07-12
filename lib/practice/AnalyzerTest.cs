@@ -1,6 +1,7 @@
 ﻿using System;
 using Npgsql;
 using ServiceStack.Text;
+using Features=System.Collections.Generic.Dictionary<string, bool>;
 
 namespace Rooletochka {
     internal class Program {
@@ -10,14 +11,11 @@ namespace Rooletochka {
             return new Model(connection);
         }
 
-        // Let's test!
+        // Example: analyze one url from database.
         //
-        private static void Main(string[] args) {
-            var model = CreateModel();
-
+        public static void Analyze(Model model) {
             NpgsqlDataReader urlRow = model.GetUrl();
             int siteId = urlRow.GetInt32(0);
-            long reportId = model.NewReport(siteId);
 
             string url = urlRow.GetString(1);
             Console.WriteLine(url);
@@ -25,10 +23,37 @@ namespace Rooletochka {
             Analyzer analyzer = new Analyzer(url);
             Report report = new Report(model, siteId);
             report = analyzer.Analyze(report.Id);
-            Console.WriteLine(report.mainPageResult.ToJson());
-            Console.WriteLine("Error404 " + report.Error404);
-            Console.WriteLine("Robots " + report.RobotsTxt);
             report.PutIntoDB(model, siteId);
+        }
+
+        // Example: grab information for .pdf generation from database.
+        //
+        public static void WriteReadyData(Model model) {
+            NpgsqlDataReader urlRow = model.GetUrlForReport();
+            int siteId = urlRow.GetInt32(0);
+            int reportId = model.GetReportId(siteId);
+            NpgsqlDataReader subpages = model.GetSubpages(reportId);
+            while (subpages.Read()) {
+                string featuresAddress = subpages.GetString(0);
+                Console.WriteLine(featuresAddress);
+
+                Features rules = subpages.GetString(1).FromJson<Features>();
+                foreach (var rule in rules) {
+                    Console.WriteLine(rule.Key + " = " + rule.Value);
+                    if (rule.Value) {
+                        Console.WriteLine(model.Explain(rule.Key));
+                    }
+                }
+            }
+        }
+
+        // Let's test!
+        //
+        private static void Main(string[] args) {
+            var model = CreateModel();
+            // Analyze(model);
+
+            WriteReadyData(model);
             Console.Read();
         }
     }
