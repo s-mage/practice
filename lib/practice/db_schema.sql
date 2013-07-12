@@ -28,7 +28,7 @@ CREATE TABLE subpages (
 );
 
 CREATE TABLE rules (
-  id integer primary key,
+  id serial primary key,
   name varchar(120) not null,
   common boolean default 'true',
   message varchar(1500) not null

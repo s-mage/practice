@@ -48,9 +48,9 @@ namespace Rooletochka {
         // so it looks necessary to lead input URL to some standart form.
         //
         private string NormalizeUrl(string url) {
-	        url = url.Trim();
-	        if (url[url.Length - 1] == '/') return url.Remove(url.Length - 1).ToLower();
-	        return url;
+            url = url.Trim();
+            if (url[url.Length - 1] == '/') return url.Remove(url.Length - 1).ToLower();
+            return url;
         }
 
         public Report Analyze(long reportId) {
@@ -74,7 +74,7 @@ namespace Rooletochka {
                 }
                 catch (Exception ex) {
                     Console.WriteLine("method: Report Analyze(...)\n {0}\n, stackTrace{1} ",
-						ex.Message, ex.StackTrace);
+                        ex.Message, ex.StackTrace);
                 }
             }
             return report;
@@ -127,7 +127,7 @@ namespace Rooletochka {
                     @"<a.*?href\s*=(['""][^""]*['""])", @"$1",
                     RegexOptions.IgnoreCase);
                 link = link.Trim("\"".ToCharArray());
-				if (link.Length<=2||Regex.Match(link, @"^//").Success) { continue; }
+                if (link.Length<=2||Regex.Match(link, @"^//").Success) { continue; }
                 if ((link[0] == '/') || Regex.Match(link, @"^\./").Success) {
                     link = url + link;
                 }
@@ -167,7 +167,7 @@ namespace Rooletochka {
         public bool CheckMirror(string url) {
             bool redirect = false;
             int statusCode = CheckStatusCode(url, redirect);
-	        return (statusCode == 301 || statusCode == 302);
+            return (statusCode == 301 || statusCode == 302);
         }
 
         private int CheckStatusCode(string url, bool redirect) {

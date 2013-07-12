@@ -6,9 +6,11 @@ using Features=System.Collections.Generic.Dictionary<string, bool>;
 namespace Rooletochka {
     internal class Program {
         public static Model CreateModel() {
-            //string connect = "Server=127.0.0.1;Port=5432;User Id=s;Database=practice;";
-			//connect string for windows
-			string connect="Server=127.0.0.1;Port=5432;User Id=postgres;Password=1111;Database=test_db;Preload Reader = true;";
+            string connect = @"Server=127.0.0.1;Port=5432;User Id=s;
+                Database=practice;";
+            // Connection string for windows.
+            // string connect = @"Server=127.0.0.1;Port=5432;User Id=postgres;
+            //    Password=1111;Database=test_db;Preload Reader = true;";
             var connection = new NpgsqlConnection(connect);
             return new Model(connection);
         }
@@ -16,24 +18,24 @@ namespace Rooletochka {
         // Example: analyze one url from database.
         //
         public static void Analyze(Model model) {
-	        try {
-		        NpgsqlDataReader urlRow = model.GetUrl();
-		        int siteId = urlRow.GetInt32(0);
+            try {
+                NpgsqlDataReader urlRow = model.GetUrl();
+                int siteId = urlRow.GetInt32(0);
 
-		        string url = urlRow.GetString(1);
-		        Console.WriteLine(url);
+                string url = urlRow.GetString(1);
+                Console.WriteLine(url);
 
-		        Analyzer analyzer = new Analyzer(url);
-		        Report report = new Report(model, siteId);
-		        report = analyzer.Analyze(report.Id);
-		        report.PutIntoDB(model, siteId);
-	        }
-	        catch (InvalidOperationException ex) {
-		        Console.WriteLine("Analyze Error: {0}", ex.Message);
-	        }
-	        catch (Exception ex) {
-		        Console.WriteLine(ex.Message);
-	        }
+                Analyzer analyzer = new Analyzer(url);
+                Report report = new Report(model, siteId);
+                report = analyzer.Analyze(report.Id);
+                report.PutIntoDB(model, siteId);
+            }
+            catch (InvalidOperationException ex) {
+                Console.WriteLine("Analyze Error: {0}", ex.Message);
+            }
+            catch (Exception ex) {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         // Example: grab information for .pdf generation from database.

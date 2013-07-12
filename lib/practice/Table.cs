@@ -38,8 +38,8 @@ namespace Rooletochka {
 
             string connect = String.Format(@"Server=127.0.0.1;Port=5432;
                 User Id={0};Password={1};Database=practice;", userId, password);
-			//Windows connection string
-			//string connect="Server=127.0.0.1;Port=5432;User Id=postgres;Password=1111;Database=test_db;Preload Reader = true;";
+            //Windows connection string
+            //string connect="Server=127.0.0.1;Port=5432;User Id=postgres;Password=1111;Database=test_db;Preload Reader = true;";
             connection = new NpgsqlConnection(connect);
 
             command = com;
