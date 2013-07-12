@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -135,29 +136,28 @@ namespace Rooletochka {
                     @"<a.*?href\s*=(['""][^""]*['""])", @"$1",
                     RegexOptions.IgnoreCase);
                 link = link.Trim("\"".ToCharArray());
-                if (link.Length > 2 && (link[0] == '/' || link[0] == '.' || link.Contains(url))) {
-                    if (link[0] == '/' && link[1] == '/')
-                        continue;
-                    if ((link[0] == '/') || (link[0] == '.' && link[1] == '/'))
-                        link = url + link;
-                    if (link.Contains(url)) {}
-                    else continue;
+                if (Regex.Match(link, "^//")) { continue; }
+                if ((link[0] == '/') || Regex.Match(link, "^\./")) {
+                    link = url + link;
                 }
-                else continue;
-
-                if (IsCorrectLink(link)) {
-                    pages.Add(link);
-                }
+                if (!link.Contains(url)) { continue; }
+                if (IsCorrectLink(link)) { pages.Add(link); }
             }
             return pages;
+        }
+
+        private string GenerateRandomString(int size) {
+            string result = "";
+            while (result.Length < size) {
+                result += Path.GetRandomFileName();
+            }
+            return result.Remove(size - 1);
         }
 
         #region Methods for checking common rules
 
         public bool CheckRobotsTxt(string url) {
-            string str = "";
-            if (url[url.Length - 1] == '/') str = url + "robots.txt";
-            else str = url + "/robots.txt";
+            string str = url + "/robots.txt";
 
             const bool redirect = false;
             int statusCode = CheckStatusCode(str, redirect);
@@ -166,9 +166,7 @@ namespace Rooletochka {
         }
 
         public bool CheckError404(string url) {
-            string str = "";
-            if (url[url.Length - 1] == '/') str = url + "asdfjhkxjcv";
-            else str = url + "/asdfjhkxjcv";
+            string str = url + "/" + GenerateRandomString(42);
 
             bool redirect = true;
             int statusCode = CheckStatusCode(str, redirect);
