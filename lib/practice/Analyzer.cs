@@ -48,14 +48,9 @@ namespace Rooletochka {
         // so it looks necessary to lead input URL to some standart form.
         //
         private string NormalizeUrl(string url) {
-            int length = 0;
-            for(int i = url.Length - 1; i >= 0; i--) {
-                if (url[i] != ' ') {
-                    length = (url[i] == '/') ? i : i + 1;
-                    break;
-                }
-            }
-            return url.Remove(length).ToLower();
+	        url = url.Trim();
+	        if (url[url.Length - 1] == '/') return url.Remove(url.Length - 1).ToLower();
+	        return url;
         }
 
         public Report Analyze(long reportId) {
@@ -78,7 +73,7 @@ namespace Rooletochka {
                     Thread.Sleep(500);
                 }
                 catch (Exception ex) {
-                    Console.WriteLine(ex.Message);
+                    Console.WriteLine("method: Report Analyze(...)\n {0}\n, stackTrace{1} ", ex.Message, ex.StackTrace);
                 }
             }
             return report;

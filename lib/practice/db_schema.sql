@@ -8,7 +8,7 @@ CREATE TYPE state as enum ('nothing', 'data', 'report');
 
 CREATE TABLE sites (
   id serial primary key,
-  url char(250) unique,
+  url varchar(250) unique,
   ready state default 'nothing'
 );
 
@@ -17,12 +17,12 @@ CREATE TABLE reports (
   id serial primary key,
   site_id integer references sites(id) on update cascade,
   creation_time timestamp,
-  path char(250)
+  path varchar(250)
 );
 
 CREATE TABLE subpages (
   id serial primary key,
-  url char(250),
+  url varchar(250),
   rules json,
   report_id integer references reports(id)
 );
