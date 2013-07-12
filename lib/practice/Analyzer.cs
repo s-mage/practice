@@ -136,8 +136,8 @@ namespace Rooletochka {
                     @"<a.*?href\s*=(['""][^""]*['""])", @"$1",
                     RegexOptions.IgnoreCase);
                 link = link.Trim("\"".ToCharArray());
-                if (Regex.Match(link, "^//")) { continue; }
-                if ((link[0] == '/') || Regex.Match(link, "^\./")) {
+                if (Regex.Match(link, "^//").Success) { continue; }
+                if ((link[0] == '/') || Regex.Match(link, @"^\./").Success) {
                     link = url + link;
                 }
                 if (!link.Contains(url)) { continue; }
