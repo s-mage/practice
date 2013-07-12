@@ -73,7 +73,8 @@ namespace Rooletochka {
                     Thread.Sleep(500);
                 }
                 catch (Exception ex) {
-                    Console.WriteLine("method: Report Analyze(...)\n {0}\n, stackTrace{1} ", ex.Message, ex.StackTrace);
+                    Console.WriteLine("method: Report Analyze(...)\n {0}\n, stackTrace{1} ",
+						ex.Message, ex.StackTrace);
                 }
             }
             return report;
@@ -164,10 +165,9 @@ namespace Rooletochka {
         }
 
         public bool CheckMirror(string url) {
-            // TODO функцию генерирующую список (массив) url'ов для зеркал сайта
             bool redirect = false;
-            CheckStatusCode(url, redirect);
-            return false;
+            int statusCode = CheckStatusCode(url, redirect);
+	        return (statusCode == 301 || statusCode == 302);
         }
 
         private int CheckStatusCode(string url, bool redirect) {

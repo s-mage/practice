@@ -6,9 +6,9 @@ using Features=System.Collections.Generic.Dictionary<string, bool>;
 namespace Rooletochka {
     internal class Program {
         public static Model CreateModel() {
-            string connect = "Server=127.0.0.1;Port=5432;User Id=s;Database=practice;";
+            //string connect = "Server=127.0.0.1;Port=5432;User Id=s;Database=practice;";
 			//connect string for windows
-			//string connect="Server=127.0.0.1;Port=5432;User Id=postgres;Password=1111;Database=test_db;Preload Reader = true;";
+			string connect="Server=127.0.0.1;Port=5432;User Id=postgres;Password=1111;Database=test_db;Preload Reader = true;";
             var connection = new NpgsqlConnection(connect);
             return new Model(connection);
         }
