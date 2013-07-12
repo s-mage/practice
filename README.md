@@ -3,6 +3,10 @@ practice
 
 Practice at Ingate.
 
+===
+Solution для VS2010 с заготовкой под windows service, установщиком и консольным приложением 
+https://dl.dropboxusercontent.com/u/61192714/Practice/Rooletochka.rar
+
 TODO
 ====
 
@@ -14,7 +18,8 @@ TODO
   5. The same thing for .pdf generation, except the moment that we don't have
   any methods for .pdf generation now.
   6. The same thing with frontend.
-
+  7. Service for Windows (or daemon for Unix) and Multithreading -- In progress
+  
 rm
 ==
 
