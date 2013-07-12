@@ -66,7 +66,7 @@ namespace Rooletochka {
             report.Error404 = CheckError404(Url);
 
             report.mainPageResult = this.AnalyzePage(Url);
-            Features result=new Features();
+            Features result = new Features();
             int count = 0;
             foreach (string page in _pages) {
                 try {
@@ -86,24 +86,19 @@ namespace Rooletochka {
 
         private bool IsCorrectURL(string url) {
             Uri correctUrl;
-            if (Uri.TryCreate(url, UriKind.Absolute, out correctUrl) &&
-                correctUrl.Scheme == Uri.UriSchemeHttp) {
-                return true;
-            }
-            return false;
+            return (Uri.TryCreate(url, UriKind.Absolute, out correctUrl) &&
+                correctUrl.Scheme == Uri.UriSchemeHttp);
         }
 
         // check on correct url and than link != link to the file, except .php
         private bool IsCorrectLink(string link) {
             if (!IsCorrectURL(link)) return false;
 
-            int count = link.Length - 1;
             string buffer = "";
-            while (count >= 0) {
-                buffer = link[count] + buffer;
-                count--;
-                if (link[count] == '.' || link[count] == '/')
-                    break;
+            int i = link.Length - 1;
+            while (i >= 0 && link[i] != '.' && link[i] != '/') {
+                buffer = link[i] + buffer;
+                i--;
             }
             if (buffer.Length <= 3) {
                 return (buffer.ToLower().Contains("php"));
