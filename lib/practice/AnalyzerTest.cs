@@ -12,14 +12,9 @@ namespace Rooletochka {
             return new Model(connection);
         }
 
-        // Let's test!
-        //
-        private static void Main(string[] args) {
-            var model = CreateModel();
-
+        public static void Analyze(Model model) {
             NpgsqlDataReader urlRow = model.GetUrl();
             int siteId = urlRow.GetInt32(0);
-            long reportId = model.NewReport(siteId);
 
             string url = urlRow.GetString(1);
             Console.WriteLine(url);
@@ -27,10 +22,16 @@ namespace Rooletochka {
             Analyzer analyzer = new Analyzer(url);
             Report report = new Report(model, siteId);
             report = analyzer.Analyze(report.Id);
-            Console.WriteLine(report.mainPageResult.ToJson());
-            Console.WriteLine("Error404 " + report.Error404);
-            Console.WriteLine("Robots " + report.RobotsTxt);
             report.PutIntoDB(model, siteId);
+        }
+
+        // Let's test!
+        //
+        private static void Main(string[] args) {
+            var model = CreateModel();
+            Analyze(model);
+
+
             Console.Read();
         }
     }
