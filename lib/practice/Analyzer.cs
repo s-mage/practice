@@ -49,7 +49,9 @@ namespace Rooletochka {
         //
         private string NormalizeUrl(string url) {
             url = url.Trim();
-            if (url[url.Length - 1] == '/') return url.Remove(url.Length - 1).ToLower();
+            if (url[url.Length - 1] == '/') {
+                return url.Remove(url.Length - 1).ToLower();
+            }
             return url;
         }
 
@@ -73,8 +75,8 @@ namespace Rooletochka {
                     Thread.Sleep(500);
                 }
                 catch (Exception ex) {
-                    Console.WriteLine("method: Report Analyze(...)\n {0}\n, stackTrace{1} ",
-                        ex.Message, ex.StackTrace);
+                    Console.WriteLine(@"method: Report Analyze(...)\n {0}\n,
+                        stackTrace{1} ", ex.Message, ex.StackTrace);
                 }
             }
             return report;
@@ -127,7 +129,9 @@ namespace Rooletochka {
                     @"<a.*?href\s*=(['""][^""]*['""])", @"$1",
                     RegexOptions.IgnoreCase);
                 link = link.Trim("\"".ToCharArray());
-                if (link.Length<=2||Regex.Match(link, @"^//").Success) { continue; }
+                if (link.Length <= 2 || Regex.Match(link, @"^//").Success) {
+                    continue;
+                }
                 if ((link[0] == '/') || Regex.Match(link, @"^\./").Success) {
                     link = url + link;
                 }
@@ -174,7 +178,9 @@ namespace Rooletochka {
             try {
                 HttpWebRequest webRequest = (HttpWebRequest) WebRequest.Create(url);
                 webRequest.AllowAutoRedirect = redirect;
-                //Timeout of request (default timeout = 100s)
+
+                // Timeout of request (default timeout = 100s).
+                //
                 webRequest.Timeout = 50000;
                 HttpWebResponse response = (HttpWebResponse) webRequest.GetResponse();
                 int wRespStatusCode;
@@ -195,7 +201,7 @@ namespace Rooletochka {
 
         #endregion
 
-        #region Methods for checking Html tags (true - OK, false - necessary corrections)
+        #region Methods for checking Html tags (true - OK, false - page needs corrections)
 
         private bool CheckInlineJS() {
             string pattern = @"<script.*?>";
@@ -238,7 +244,8 @@ namespace Rooletochka {
         // Example: CheckTag("html") will check page for <html> and </html>.
         //
         private bool CheckTag(string tag) {
-            return Content.Contains("<"+tag) && Content.Contains("</"+tag+">");
+            return Content.Contains("<" + tag) &&
+                Content.Contains("</" + tag + ">");
         }
 
         #endregion

@@ -45,6 +45,7 @@ namespace Rooletochka {
             int siteId = urlRow.GetInt32(0);
             int reportId = model.GetReportId(siteId);
             NpgsqlDataReader subpages = model.GetSubpages(reportId);
+
             while (subpages.Read()) {
                 string featuresAddress = subpages.GetString(0);
                 Console.WriteLine(featuresAddress);
@@ -52,7 +53,7 @@ namespace Rooletochka {
                 Features rules = subpages.GetString(1).FromJson<Features>();
                 foreach (var rule in rules) {
                     Console.WriteLine(rule.Key + " = " + rule.Value);
-                    if (rule.Value) {
+                    if (!rule.Value) {
                         Console.WriteLine(model.Explain(rule.Key));
                     }
                 }
@@ -65,7 +66,7 @@ namespace Rooletochka {
             var model = CreateModel();
             Analyze(model);
 
-            //WriteReadyData(model);
+            WriteReadyData(model);
             Console.Read();
         }
     }

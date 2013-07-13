@@ -71,7 +71,8 @@ namespace Rooletochka {
         // Get explanation of rule given it name.
         //
         public string Explain(string rule) {
-            Table result = rules.Select("message").Where("name = " + rule).
+            string condition = String.Format("name = '{0}'", rule);
+            Table result = rules.Select("message").Where(condition).
                 First().All();
             if (result.data.Read()) { return result.data.GetString(0); }
             return "";
