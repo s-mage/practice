@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Threading;
 using Npgsql;
 using ServiceStack.Text;
 using Features = System.Collections.Generic.Dictionary<string, bool>;
 
 namespace Rooletochka {
     internal class Program {
+        const int SLEEP_TIME = 1000;
+        static object urlLocker = new object();
+        static object reportLocker = new object();
+
         public static Model CreateModel() {
             string connect = @"Server = 127.0.0.1; Port = 5432; User Id = s;
                 Database = practice;";
@@ -18,30 +23,73 @@ namespace Rooletochka {
         // Example: analyze one url from database.
         //
         public static void Analyze(Model model) {
+            string url = "";
+            int siteId = -1;
+            NpgsqlDataReader urlRow;
+
             try {
-                NpgsqlDataReader urlRow = model.GetUrl();
-                int siteId = urlRow.GetInt32(0);
+                // This part must be locked, otherwise thread will read
+                // the same site.
+                //
+                lock (urlLocker) {
+                    urlRow = model.GetUrl();
 
-                string url = urlRow.GetString(1);
+                    // If database haven't site to analyze.
+                    //
+                    if (!urlRow.Read()) {
+                        Console.WriteLine("All sites are processed or "
+                            + "processing now.");
+                        Thread.Sleep(SLEEP_TIME);
+                        return;
+                    }
+                    siteId = urlRow.GetInt32(0);
+                    model.MarkSiteProcessed(siteId);
+                }
+                url = urlRow.GetString(1);
                 Console.WriteLine(url);
+            } catch (InvalidOperationException exception) {
+                Console.WriteLine("Database error: " + exception.Message);
+                return;
+            }
 
+            try {
                 Analyzer analyzer = new Analyzer(url);
-                Report report = new Report(model, siteId);
+                Report report;
+                // Report constructor creates new report at database and get
+                // last inserted value.
+                //
+                lock (reportLocker) { report = new Report(model, siteId); }
                 report = analyzer.Analyze(report.Id);
                 report.PutIntoDB(model, siteId);
+                Thread.Sleep(SLEEP_TIME);
             }
             catch (InvalidOperationException ex) {
                 Console.WriteLine("Analyze Error: {0}", ex.Message);
+                model.MarkSiteFailed(siteId);
             }
             catch (Exception ex) {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine("Unknown error: " + ex.Message);
+                model.MarkSiteFailed(siteId);
             }
         }
 
-        // Example: grab information for .pdf generation from database.
+        // Function for execution at thread. Calls Analyze() function at
+        // infinite cycle.
+        public static void OneThread(object model) {
+            Model castModel = (Model) model;
+            while (true) { Analyze(castModel); }
+        }
+
+        // Example: grab information for .pdf generation from database
+        // and write it to stdout.
         //
         public static void WriteReadyData(Model model) {
             NpgsqlDataReader urlRow = model.GetUrlForReport();
+
+            // Check if database have site ready for .pdf generation.
+            //
+            if (!urlRow.Read()) { return; }
+
             int siteId = urlRow.GetInt32(0);
             int reportId = model.GetReportId(siteId);
             NpgsqlDataReader subpages = model.GetSubpages(reportId);
@@ -63,11 +111,13 @@ namespace Rooletochka {
         // Let's test!
         //
         private static void Main(string[] args) {
+            const int THREADS_COUNT = 10;
             var model = CreateModel();
-            Analyze(model);
+            for (int i = 0; i < THREADS_COUNT; i++) {
+                new Thread(OneThread).Start((object) model);
+            }
 
-            WriteReadyData(model);
-            Console.Read();
+            // WriteReadyData(model);
         }
     }
 }

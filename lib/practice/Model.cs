@@ -30,6 +30,14 @@ namespace Rooletochka {
             sites.Update(command).Where("id = " + siteId).All();
         }
 
+        // Get the first row of table 'sites' where field 'ready' is state.
+        //
+        private NpgsqlDataReader GetSiteWithState(string state) {
+            string command = String.Format("ready = '{0}'", state);
+            Table result = sites.Select("*").Where(command).First().All();
+            return result.data;
+        }
+
         // Add new row to table 'reports' and link it with site.
         //
         public long NewReport(int siteId) {
@@ -42,20 +50,14 @@ namespace Rooletochka {
         // Get first url that needs to be processed.
         //
         public NpgsqlDataReader GetUrl() {
-            Table result = sites.Select("*").Where("ready = 'nothing'").
-                First().All();
-            result.data.Read();
-            return result.data;
+            return GetSiteWithState("nothing");
         }
 
         // Get first url that already analyzed but report for what is
         // not generated.
         //
         public NpgsqlDataReader GetUrlForReport() {
-            Table result = sites.Select("*").Where("ready = 'data'").
-                First().All();
-            result.data.Read();
-            return result.data;
+            return GetSiteWithState("data");
         }
 
         // Get last report id given site id.
@@ -106,6 +108,12 @@ namespace Rooletochka {
         //
         public void MarkSiteProcessed(int siteId) {
             SetSiteState(siteId, "processing");
+        }
+
+        // Say that processing of site with given id was failed.
+        //
+        public void MarkSiteFailed(int siteId) {
+            SetSiteState(siteId, "failed");
         }
     }
 }
