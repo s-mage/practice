@@ -14,7 +14,7 @@ namespace Rooletochka {
 
         // Id of report in database.
         //
-        private long id;
+        private int id;
 
         // URL of main page.
         //
@@ -62,7 +62,7 @@ namespace Rooletochka {
             mainPageResult = new Dictionary<string, bool>();
         }
 
-        public Report(long reportId) : this() {
+        public Report(int reportId) : this() {
             id = reportId;
         }
 
@@ -70,7 +70,7 @@ namespace Rooletochka {
             id = model.NewReport(siteId);
         }
 
-        public long Id {
+        public int Id {
             get { return id; }
         }
 

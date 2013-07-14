@@ -56,10 +56,18 @@ namespace Rooletochka {
                     data = query.ExecuteReader();
                     break;
                 case QueryType.Update:
+                case QueryType.Insert:
                     query.ExecuteNonQuery();
                     break;
             }
             return this;
+        }
+
+        public object Returning(string field) {
+            string result = String.Format("{0} returning {1}", command, field);
+            var query = new NpgsqlCommand(result, connection);
+
+            return query.ExecuteScalar();
         }
 
         // Select operator, you can write something like
@@ -100,7 +108,7 @@ namespace Rooletochka {
             return new Table(result, connection, type);
         }
 
-        public void Insert(string values, string fields = "") {
+        public Table Insert(string values, string fields = "") {
             string query;
 
             if(fields == "") {
@@ -110,8 +118,7 @@ namespace Rooletochka {
                 query = String.Format(@"insert into {0} ({1})
                     values ({2})", command, fields, values);
             }
-            NpgsqlCommand insertCommand = new NpgsqlCommand(query, connection);
-            insertCommand.ExecuteNonQuery();
+            return new Table(query, connection, QueryType.Insert);
         }
     }
 }

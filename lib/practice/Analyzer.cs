@@ -55,7 +55,7 @@ namespace Rooletochka {
             return url;
         }
 
-        public Report Analyze(long reportId) {
+        public Report Analyze(int reportId) {
             Report report = new Report(reportId);
             report.MainUrl = Url;
             report.RobotsTxt = CheckRobotsTxt(Url);

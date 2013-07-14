@@ -40,11 +40,11 @@ namespace Rooletochka {
 
         // Add new row to table 'reports' and link it with site.
         //
-        public long NewReport(int siteId) {
-            reports.Insert(siteId.ToString(), "site_id");
-            Table result = reports.Select("lastval()").All();
-            result.data.Read();
-            return result.data.GetInt64(0);
+        public int NewReport(int siteId) {
+            object result = reports.Insert(siteId.ToString(), "site_id").
+                Returning("id");
+            Console.WriteLine(result.GetType());
+            return (int) result;
         }
 
         // Get first url that needs to be processed.
@@ -91,11 +91,11 @@ namespace Rooletochka {
         // Put result of analysis of one subpage to table 'subpages'
         // and link it with report.
         //
-        public void PutRules(long reportId, string url,
+        public void PutRules(int reportId, string url,
             Dictionary<string, bool> rules) {
             string values = String.Format("'{0}', '{1}', {2}",
                 url, rules.ToJson(), reportId.ToString());
-            subpages.Insert(values, "url, rules, report_id");
+            subpages.Insert(values, "url, rules, report_id").All();
         }
 
         // Update field 'ready' to value 'data' for given id of site.

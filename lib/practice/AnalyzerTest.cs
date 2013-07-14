@@ -58,7 +58,7 @@ namespace Rooletochka {
                 // Report constructor creates new report at database and get
                 // last inserted value.
                 //
-                lock (reportLocker) { report = new Report(model, siteId); }
+                report = new Report(model, siteId);
                 report = analyzer.Analyze(report.Id);
                 report.PutIntoDB(model, siteId);
                 Thread.Sleep(SLEEP_TIME);
