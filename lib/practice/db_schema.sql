@@ -4,7 +4,7 @@ CREATE TABLE users (
   password varchar(20) not null
 );
 
-CREATE TYPE state as enum ('nothing', 'data', 'report');
+CREATE TYPE state as enum ('nothing', 'data', 'report', 'processing', 'failed');
 
 CREATE TABLE sites (
   id serial primary key,

@@ -99,7 +99,7 @@ namespace Rooletochka {
                 i--;
             }
             if (buffer.Length <= 3) {
-                return (buffer.ToLower().Contains("php"));
+                return (buffer.ToLower() == "php");
             }
             return true;
         }
@@ -129,10 +129,10 @@ namespace Rooletochka {
                     @"<a.*?href\s*=(['""][^""]*['""])", @"$1",
                     RegexOptions.IgnoreCase);
                 link = link.Trim("\"".ToCharArray());
-                if (link.Length <= 2 || Regex.Match(link, @"^//").Success) {
+                if (link.Length <= 2 || Regex.IsMatch(link, @"^//")) {
                     continue;
                 }
-                if ((link[0] == '/') || Regex.Match(link, @"^\./").Success) {
+                if ((link[0] == '/') || Regex.IsMatch(link, @"^\./")) {
                     link = url + link;
                 }
                 if (!link.Contains(url)) { continue; }

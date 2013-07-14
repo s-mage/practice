@@ -23,6 +23,13 @@ namespace Rooletochka {
             rules = new Table("rules", connection);
         }
 
+        // Update field 'ready' to value state for given id of site.
+        //
+        private void SetSiteState(int siteId, string state) {
+            string command = String.Format("ready = '{0}'", state);
+            sites.Update(command).Where("id = " + siteId).All();
+        }
+
         // Add new row to table 'reports' and link it with site.
         //
         public long NewReport(int siteId) {
@@ -92,7 +99,13 @@ namespace Rooletochka {
         // Update field 'ready' to value 'data' for given id of site.
         //
         public void DataIsReady(int siteId) {
-            sites.Update("ready = 'data'").Where("id = " + siteId).All();
+            SetSiteState(siteId, "data");
+        }
+
+        // Mark site with given id as processed.
+        //
+        public void MarkSiteProcessed(int siteId) {
+            SetSiteState(siteId, "processing");
         }
     }
 }
