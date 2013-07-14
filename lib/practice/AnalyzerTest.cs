@@ -8,7 +8,6 @@ namespace Rooletochka {
     internal class Program {
         const int SLEEP_TIME = 1000;
         static object urlLocker = new object();
-        static object reportLocker = new object();
 
         public static Model CreateModel() {
             string connect = @"Server = 127.0.0.1; Port = 5432; User Id = s;
@@ -27,38 +26,28 @@ namespace Rooletochka {
             int siteId = -1;
             NpgsqlDataReader urlRow;
 
-            try {
-                // This part must be locked, otherwise thread will read
-                // the same site.
-                //
-                lock (urlLocker) {
-                    urlRow = model.GetUrl();
+            // This part must be locked, otherwise threads will read
+            // the same site.
+            //
+            lock (urlLocker) {
+                urlRow = model.GetUrl();
 
-                    // If database haven't site to analyze.
-                    //
-                    if (!urlRow.Read()) {
-                        Console.WriteLine("All sites are processed or "
-                            + "processing now.");
-                        Thread.Sleep(SLEEP_TIME);
-                        return;
-                    }
-                    siteId = urlRow.GetInt32(0);
-                    model.MarkSiteProcessed(siteId);
+                // If database haven't site to analyze.
+                if (!urlRow.Read()) {
+                    Console.WriteLine("All sites are processed or "
+                        + "processing now.");
+                    Thread.Sleep(SLEEP_TIME);
+                    return;
                 }
-                url = urlRow.GetString(1);
-                Console.WriteLine(url);
-            } catch (InvalidOperationException exception) {
-                Console.WriteLine("Database error: " + exception.Message);
-                return;
+                siteId = urlRow.GetInt32(0);
+                model.MarkSiteProcessed(siteId);
             }
+            url = urlRow.GetString(1);
+            Console.WriteLine(url);
 
             try {
                 Analyzer analyzer = new Analyzer(url);
-                Report report;
-                // Report constructor creates new report at database and get
-                // last inserted value.
-                //
-                report = new Report(model, siteId);
+                Report report = new Report(model, siteId);
                 report = analyzer.Analyze(report.Id);
                 report.PutIntoDB(model, siteId);
                 Thread.Sleep(SLEEP_TIME);
