@@ -4,7 +4,7 @@ Rooletochka
 Rooletochka is small tool for checking sites on compliance with some rules. This
 is task for practice at Ingate.
 
-[logo]: ./screen.png "Main screen of tool"
+[logo]: https://github.com/s-mage/practice/blob/master/screen.png "Main screen of tool"
 
 ===
 Solution для VS2010 с заготовкой под windows service, установщиком и консольным приложением
