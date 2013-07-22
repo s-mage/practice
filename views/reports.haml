@@ -1,0 +1,17 @@
+.row
+  .large-10.columns
+    %form{action: '/add_site', method: 'post'}
+      %fieldset
+        %label{for: 'uri'} Add site to analyze:
+        %input{type: 'text', name: 'uri', class: 'text', title: 'Add site to analyze'}
+        %input.button.expand{type: 'submit', value: 'Add!'}
+.row
+  .large-10.columns
+    %table#sites.large-12
+      %tbody
+        -@reports.each do |report|
+          %tr
+            %td
+              %p =report[:url]
+            %td
+              %a{href: '/' + name[:id].to_s, title: report[:path]} #{report[:path]}
