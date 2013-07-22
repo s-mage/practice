@@ -19,7 +19,7 @@ class Rooletochka::Frontend < Sinatra::Base
   end
 
   post '/add_site' do
-    add_site(current_user.values[:id], params[:url])
+    add_site(current_user.values[:id], params[:uri])
     haml :done
   end
 

@@ -8,10 +8,20 @@
 .row
   .large-10.columns
     %table#sites.large-12
+      %thead
+        %tr
+          %th Url
+          %th State
+          %th Creation time
+          %th Link to report
       %tbody
-        -@reports.each do |report|
+        - @reports.each do |report|
           %tr
             %td
-              %p =report[:url]
+              = report[:url]
             %td
-              %a{href: '/' + name[:id].to_s, title: report[:path]} #{report[:path]}
+              = report[:ready]
+            %td
+              = report[:creation_time]
+            %td
+              %a{href: '/' + (report[:path] || ''), title: 'Download'} #{report[:path]}
